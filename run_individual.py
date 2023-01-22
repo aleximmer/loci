@@ -15,6 +15,7 @@ from causa.heci import HECI
 from causa.hsic import HSIC
 from causa.het_ridge import convex_fgls
 from causa.utils import TensorDataLoader
+from causa.gnn_fast import GNN
 
 
 def set_seed(seed):
@@ -129,10 +130,16 @@ def experiment(experiment_name,
     print(f'd={d}, k={k}, n={batch_size}')
 
     # NOTE: all scores such that higher is better (log ml, log lik) gives score!
-
-    # can run HECI baseline
     x_true = dataset.cause.numpy().flatten()
     x_false = dataset.effect.numpy().flatten()
+
+    # run CGNN baseline (batch size 200 runs under 1h for all pairs at least)
+    # default of batch size -1 would crash and 1000 is too (up to 6h for some pairs)
+    prob = GNN(verbose=False, batch_size=min(200, batch_size)).predict_proba((x_true, x_false))
+    df.loc[pair_id, 'cgnn_true'] = prob
+    df.loc[pair_id, 'cgnn_false'] = -prob
+
+    # run HECI baseline
     heci_cause = x_true.tolist()
     heci_effect = x_false.tolist()
     _, score_true, score_false = HECI(heci_cause, heci_effect)
