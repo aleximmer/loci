@@ -224,18 +224,16 @@ def compute_performance(frame, benchmark):
         assess_method(method)
     
     # handle external methods
-    # QCCD, GRCI, CAM, IGCI, IGCI_G
+    # QCCD, GRCI, CAM, IGCI
     acc_frame['QCCD'] = (frame['QCCD'] * frame['GroundTruth']) > 0
     acc_frame['GRCI'] = (frame['GRCI'] * frame['GroundTruth']) > 0
     acc_frame['CAM'] = (frame['CAM'] * frame['GroundTruth']) > 0
     acc_frame['IGCI'] = (frame['IGCI'] * frame['GroundTruth']) > 0
-    acc_frame['IGCI_G'] = (frame['IGCI_G'] * frame['GroundTruth']) > 0
     acc_frame['RESIT'] = (frame['RESIT_std'] * frame['GroundTruth']) > 0
     conf_frame['QCCD'] = frame['QCCD'].abs()
     conf_frame['GRCI'] = frame['GRCI'].abs()
     conf_frame['CAM'] = frame['CAM'].abs()
     conf_frame['IGCI'] = frame['IGCI'].abs()
-    conf_frame['IGCI_G'] = frame['IGCI_G'].abs()
     conf_frame['RESIT'] = frame['RESIT_std'].abs()
     
     return acc_frame.sort_index(axis='columns'), conf_frame.sort_index(axis='columns')
@@ -245,7 +243,7 @@ for benchmark in benchmarks:
     frame = build_result_table(benchmark)
     results[benchmark]['accs'], results[benchmark]['confs'] = compute_performance(frame, benchmark)
 
-baselines = ['CAM', 'GRCI', 'QCCD', 'RESIT', 'heci', 'lin_ml', 'lin_ml_hsic', 'nn_ml', 'nn_ml_hsic']
+baselines = ['CAM', 'GRCI', 'QCCD', 'RESIT', 'IGCI', 'cgnn', 'heci', 'lin_ml', 'lin_ml_hsic', 'nn_ml', 'nn_ml_hsic']
 our_methods = ['lin_ml_hetconv', 'lin_ml_hetconv_hsic', 'nn_ml_het', 'nn_ml_het_hsic']
 method_filter = baselines + our_methods
 columns = results['Tuebingen']['accs'].columns
@@ -393,12 +391,12 @@ with plt.rc_context({**bundles.aistats2022(column='half'), **axes.lines()}):
 plt.savefig('paper_figures/overall.pdf')
 
 # Tables
-methods = ['nn_ml_het', 'nn_ml_het_hsic', 'lin_ml_hetconv', 'lin_ml_hetconv_hsic', 'GRCI', 'QCCD', 'heci', 'CAM', 'RESIT']
+methods = ['nn_ml_het', 'nn_ml_het_hsic', 'lin_ml_hetconv', 'lin_ml_hetconv_hsic', 'GRCI', 'QCCD', 'heci', 'cgnn', 'IGCI', 'CAM', 'RESIT']
 method_names = [r'NN-$\textsc{Loci}_\textrm{M}$', 
                 r'NN-$\textsc{Loci}_\textrm{H}$', 
                 r'$\textsc{Loci}_\textrm{M}$', 
                 r'$\textsc{Loci}_\textrm{H}$',
-                'GRCI', 'QCCD', 'HECI', 'CAM', 'RESIT']
+                'GRCI', 'QCCD', 'HECI', 'CGNN', 'IGCI', 'CAM', 'RESIT']
 datasets = ['AN', 'ANs', 'LS', 'LSs', 'MNU', 'SIM', 'SIMc', 'SIMln', 'SIMG', 'Tuebingen', 'Cha', 'Net', 'Multi']
 # Accuracy Table
 res_table = accuracy_table.loc[datasets, methods].rename({k: v for k, v in zip(methods, method_names)}, axis=1) * 100
