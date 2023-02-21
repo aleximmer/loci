@@ -97,6 +97,7 @@ model, losses = map_optimization(
 )[:2]
 print('NN LSNM LOGLIK true', -losses[-1] / len(dataset.effect))
 loc_true_nn, scale_true_nn = compute_loc_scale(test_data_true, model)
+loc_true_nn_scat, scale_true_nn_scat = compute_loc_scale(dataset.cause.to(device), model)
 
 # False order
 loader = TensorDataLoader(
@@ -109,6 +110,7 @@ model, losses = map_optimization(
 )[:2]
 print('NN LSNM LOGLIK wrong', -losses[-1] / len(dataset.effect))
 loc_false_nn, scale_false_nn = compute_loc_scale(test_data_false, model)
+loc_false_nn_scat, scale_false_nn_scat = compute_loc_scale(dataset.effect.to(device), model)
 
 map_kwargs = {**map_kwargs, **dict(likelihood='regression')}
 
@@ -140,10 +142,10 @@ with plt.rc_context({**bundles.aistats2022(column='half'), **axes.lines()}):
     fig, axs = plt.subplots(nrows=1, ncols=2, figsize=(3.25, 1.8))
     axs[0].scatter(dataset.cause.flatten().numpy(), dataset.effect.flatten().numpy(), alpha=0.3, color='black',
                    lw=0.5, s=8)
-    axs[0].plot(test_data_true.flatten(), loc_true_nn, label='LSNM', color=orange, lw=1.5)
+    axs[0].plot(test_data_true.flatten(), loc_true_nn, label='LSNM', color=blue, lw=1.5)
     axs[0].fill_between(test_data_true.flatten(), loc_true_nn-2*scale_true_nn, 
-                        loc_true_nn+2*scale_true_nn, color=orange, alpha=0.3)
-    axs[0].plot(test_data_true.flatten(), mean_true_ml, label='ANM', color=blue, lw=1.5)
+                        loc_true_nn+2*scale_true_nn, color=blue, alpha=0.3)
+    axs[0].plot(test_data_true.flatten(), mean_true_ml, label='ANM', color=orange, lw=1.5)
     axs[0].set_xlim(test_data_true.min()+0.4, test_data_true.max())
     axs[0].set_ylim(y_true.min()-1, y_true.max()+1)
     axs[0].grid()
@@ -153,11 +155,10 @@ with plt.rc_context({**bundles.aistats2022(column='half'), **axes.lines()}):
 
     axs[1].scatter(dataset.effect.flatten().numpy(), dataset.cause.flatten().numpy(), alpha=0.3, color='black',
                    lw=0.5, s=8)
-    # axs[1].plot(test_data_false.flatten(), y_pred_false_nn, label='Homo')
-    axs[1].plot(test_data_false.flatten(), loc_false_nn, label='LSNM', color=orange, lw=1.5)
+    axs[1].plot(test_data_false.flatten(), loc_false_nn, label='LSNM', color=blue, lw=1.5)
     axs[1].fill_between(test_data_false.flatten(), loc_false_nn-2*scale_false_nn, 
-                        loc_false_nn+2*scale_false_nn, color=orange, alpha=0.3)
-    axs[1].plot(test_data_false.flatten(), mean_false_ml, label='ANM', color=blue, lw=1.5)
+                        loc_false_nn+2*scale_false_nn, color=blue, alpha=0.3)
+    axs[1].plot(test_data_false.flatten(), mean_false_ml, label='ANM', color=orange, lw=1.5)
     axs[1].legend()
     axs[1].set_xlim(test_data_false.min(), test_data_false.max())
     axs[1].set_ylim(y_false.min()-1, y_false.max()+1)
@@ -166,6 +167,53 @@ with plt.rc_context({**bundles.aistats2022(column='half'), **axes.lines()}):
     axs[1].set_title('Anticausal Direction')
     axs[1].grid()
 plt.savefig('paper_figures/MNU_55_example.pdf')
+plt.show()
+
+
+with plt.rc_context({**bundles.aistats2022(column='half'), **axes.lines()}):
+    fig, axss = plt.subplots(nrows=2, ncols=2, figsize=(4.25, 3.25))
+    axs = axss[0]
+    axs[0].scatter(dataset.cause.flatten().numpy(), dataset.effect.flatten().numpy(), alpha=0.3, color='black',
+                   lw=0.5, s=8)
+    axs[0].plot(test_data_true.flatten(), loc_true_nn, label='LSNM', color=blue, lw=1.5)
+    axs[0].fill_between(test_data_true.flatten(), loc_true_nn-2*scale_true_nn, 
+                        loc_true_nn+2*scale_true_nn, color=blue, alpha=0.3)
+    axs[0].set_xlim(test_data_true.min()+0.4, test_data_true.max())
+    axs[0].set_ylim(y_true.min()-1, y_true.max()+1)
+    axs[0].grid()
+    axs[0].set_xlabel('Cause $X$')
+    axs[0].set_ylabel('Effect $Y$')
+    axs[0].set_title('Causal Direction')
+
+    axs[1].scatter(dataset.effect.flatten().numpy(), dataset.cause.flatten().numpy(), alpha=0.3, color='black',
+                   lw=0.5, s=8)
+    axs[1].plot(test_data_false.flatten(), loc_false_nn, label='LSNM', color=blue, lw=1.5)
+    axs[1].fill_between(test_data_false.flatten(), loc_false_nn-2*scale_false_nn, 
+                        loc_false_nn+2*scale_false_nn, color=blue, alpha=0.3)
+    axs[1].legend()
+    axs[1].set_xlim(test_data_false.min(), test_data_false.max())
+    axs[1].set_ylim(y_false.min()-1, y_false.max()+1)
+    axs[1].set_ylabel('Cause $X$')
+    axs[1].set_xlabel('Effect $Y$')
+    axs[1].set_title('Anticausal Direction')
+    axs[1].grid()
+
+    axs = axss[1]
+    axs[0].set_xlim(test_data_true.min()+0.4, test_data_true.max())
+    axs[0].scatter(dataset.cause.flatten().numpy(), (dataset.effect.flatten().numpy() - loc_true_nn_scat) / scale_true_nn_scat, 
+                   lw=0.5, s=8, color='black', alpha=0.3)
+    axs[0].grid()
+    axs[0].set_ylabel('Residual $\\frac{Y - f(X)}{\sigma (X)}$')
+    axs[0].set_xlabel('Cause $X$')
+
+    axs[1].set_xlim(test_data_false.min(), test_data_false.max())
+    axs[1].scatter(dataset.effect.flatten().numpy(), (dataset.cause.flatten().numpy() - loc_false_nn_scat) / scale_false_nn_scat, 
+                   lw=0.5, s=8, color='black', alpha=0.3)
+    axs[1].set_xlabel('Effect $X$')
+    axs[1].set_ylabel('Residual $\\frac{X - f(Y)}{\sigma (Y)}$')
+    axs[1].grid()
+plt.savefig('paper_figures/MNU_55_example_lsnm_only.pdf')
+plt.show()
     
 
 # Causality pair benchmark results
