@@ -1,6 +1,9 @@
-# Code for LOCI estimator for bivariate causal model identification
+# Code for Location-Scale Causal Inference (LOCI) estimator for bivariate causal model identification
+
+![MNU_55_example_lsnm_only](https://user-images.githubusercontent.com/7715036/220191420-22909975-8727-4ca4-851d-7f57f818b95a.png)
 
 ## Setup
+
 Requires `python>=3.8`. Install dependencies with
 ```
 pip install -r requirements.txt
