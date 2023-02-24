@@ -166,13 +166,14 @@ with plt.rc_context({**bundles.aistats2022(column='half'), **axes.lines()}):
     axs[1].set_xlabel('Effect $Y$')
     axs[1].set_title('Anticausal Direction')
     axs[1].grid()
-plt.savefig('paper_figures/MNU_55_example.pdf')
+plt.savefig('paper_figures/MNU_55_example.pdf', transparent=True)
 plt.show()
 
 
+# NN LSNM LOGLIK true -0.7655911970636645
+# NN LSNM LOGLIK wrong -0.9233285179923271
 with plt.rc_context({**bundles.aistats2022(column='half'), **axes.lines()}):
-    fig, axss = plt.subplots(nrows=2, ncols=2, figsize=(4.25, 3.25))
-    axs = axss[0]
+    fig, axs = plt.subplots(nrows=1, ncols=2, figsize=(3.25, 1.5))
     axs[0].scatter(dataset.cause.flatten().numpy(), dataset.effect.flatten().numpy(), alpha=0.3, color='black',
                    lw=0.5, s=8)
     axs[0].plot(test_data_true.flatten(), loc_true_nn, label='LSNM', color=blue, lw=1.5)
@@ -183,7 +184,7 @@ with plt.rc_context({**bundles.aistats2022(column='half'), **axes.lines()}):
     axs[0].grid()
     axs[0].set_xlabel('Cause $X$')
     axs[0].set_ylabel('Effect $Y$')
-    axs[0].set_title('Causal Direction')
+    axs[0].set_title('Causal')
 
     axs[1].scatter(dataset.effect.flatten().numpy(), dataset.cause.flatten().numpy(), alpha=0.3, color='black',
                    lw=0.5, s=8)
@@ -195,26 +196,29 @@ with plt.rc_context({**bundles.aistats2022(column='half'), **axes.lines()}):
     axs[1].set_ylim(y_false.min()-1, y_false.max()+1)
     axs[1].set_ylabel('Cause $X$')
     axs[1].set_xlabel('Effect $Y$')
-    axs[1].set_title('Anticausal Direction')
+    axs[1].set_title('Anticausal')
     axs[1].grid()
+    plt.savefig('paper_figures/MNU_55_example_lsnm_only_top.pdf', transparent=True)
+    plt.show()
 
-    axs = axss[1]
+    fig, axs = plt.subplots(nrows=1, ncols=2, figsize=(3.25, 1.5))
     axs[0].set_xlim(test_data_true.min()+0.4, test_data_true.max())
     axs[0].scatter(dataset.cause.flatten().numpy(), (dataset.effect.flatten().numpy() - loc_true_nn_scat) / scale_true_nn_scat, 
                    lw=0.5, s=8, color='black', alpha=0.3)
     axs[0].grid()
-    axs[0].set_ylabel('Residual $\\frac{Y - f(X)}{\sigma (X)}$')
+    axs[0].set_ylabel('Residual $\\frac{Y - f(X)}{g(X)}$')
     axs[0].set_xlabel('Cause $X$')
+    axs[0].set_title('LogLik $=-0.77$')
 
     axs[1].set_xlim(test_data_false.min(), test_data_false.max())
     axs[1].scatter(dataset.effect.flatten().numpy(), (dataset.cause.flatten().numpy() - loc_false_nn_scat) / scale_false_nn_scat, 
                    lw=0.5, s=8, color='black', alpha=0.3)
-    axs[1].set_xlabel('Effect $X$')
-    axs[1].set_ylabel('Residual $\\frac{X - f(Y)}{\sigma (Y)}$')
+    axs[1].set_xlabel('Effect $Y$')
+    axs[1].set_ylabel('Residual $\\frac{X - h(Y)}{k(Y)}$')
     axs[1].grid()
-plt.savefig('paper_figures/MNU_55_example_lsnm_only.pdf')
-plt.show()
-    
+    axs[1].set_title('LogLik $=-0.92$')
+    plt.savefig('paper_figures/MNU_55_example_lsnm_only_bot.pdf', transparent=True)
+    plt.show()
 
 # Causality pair benchmark results
 result_dir = 'results/'
@@ -362,7 +366,7 @@ with plt.rc_context({**bundles.aistats2022(column='full'), **axes.lines()}):
         ax.set_title(benchmark)
     
     axs[2].set_xlabel('Accuracy [\%]', labelpad=8)
-plt.savefig('paper_figures/anlsmnu.pdf')
+plt.savefig('paper_figures/anlsmnu.pdf', transparent=True)
 
 # Comparison with Homoscedastic Estimators
 methods = ['nn_ml_het', 'nn_ml_het_hsic', 'nn_ml', 'nn_ml_hsic', 
@@ -402,7 +406,7 @@ with plt.rc_context({**bundles.aistats2022(column='half'), **axes.lines()}):
     ax.spines.right.set_visible(False)
     ax.set_ylim([0, 100.5])
     ax.set_xlim([-0.1, 4.3])
-plt.savefig('paper_figures/an_to_lsnm.pdf')
+plt.savefig('paper_figures/an_to_lsnm.pdf', transparent=True)
 
 # Overall performance comparison
 methods = ['nn_ml_het', 'nn_ml_het_hsic', 'lin_ml_hetconv', 'lin_ml_hetconv_hsic', 'GRCI', 'QCCD', 'heci', 'CAM', 'RESIT']
@@ -436,7 +440,7 @@ with plt.rc_context({**bundles.aistats2022(column='half'), **axes.lines()}):
     axs[1].set_xticks([0.0, 0.25, 0.5, 0.75, 1.0])
     axs[1].set_xticklabels([0, 25, 50, 75, 100])
     axs[1].set_xlabel('AUDRC [\%]')
-plt.savefig('paper_figures/overall.pdf')
+plt.savefig('paper_figures/overall.pdf', transparent=True)
 
 # Tables
 methods = ['nn_ml_het', 'nn_ml_het_hsic', 'lin_ml_hetconv', 'lin_ml_hetconv_hsic', 'GRCI', 'QCCD', 'heci', 'cgnn', 'IGCI', 'CAM', 'RESIT']
@@ -471,7 +475,7 @@ print(res_table.to_latex(escape=False, column_format='l|rrrrr|rrrrr|rrr'))
 
 # Estimator Benchmark
 np.random.seed(711)
-data = np.zeros((100, 11, 3))
+data = np.zeros((100, 11, 4))
 for i, seed in enumerate(np.random.randint(1, np.iinfo(np.int32).max, 100)):
     perfs = pd.read_csv(f'results/estimator_benchmark_sine_sqrt_{seed}.csv', index_col=0)
     try:
@@ -481,7 +485,7 @@ for i, seed in enumerate(np.random.randint(1, np.iinfo(np.int32).max, 100)):
 perfs_med_sqrt = pd.DataFrame(np.median(data, axis=0), columns=perfs.columns)
 
 np.random.seed(711)
-data = np.zeros((100, 11, 3))
+data = np.zeros((100, 11, 4))
 for i, seed in enumerate(np.random.randint(1, np.iinfo(np.int32).max, 100)):
     perfs = pd.read_csv(f'results/estimator_benchmark_sine_lin_{seed}.csv', index_col=0)
     try:
@@ -567,7 +571,7 @@ with plt.rc_context({**bundles.aistats2022(column='full'), **axes.lines()}):
     axs[2].set_title('IFGLS for $N=1000$')
     axs[0].scatter(1000, perfs_med_sqrt.ifgls[perfs_med_sqrt.Samples==1000], 
                    color=orange, alpha=0.8, marker='*', s=100, zorder=99, lw=0.2, edgecolor='black')
-plt.savefig('paper_figures/estimator_benchmark_sqrt.pdf')
+plt.savefig('paper_figures/estimator_benchmark_sqrt.pdf', transparent=True)
 
 with plt.rc_context({**bundles.aistats2022(column='full'), **axes.lines()}):
     fig, axs = plt.subplots(nrows=1, ncols=3, figsize=(6.75, 4.1717/2.2))
@@ -610,4 +614,4 @@ with plt.rc_context({**bundles.aistats2022(column='full'), **axes.lines()}):
     axs[2].set_title('IFGLS for $N=1000$')
     axs[0].scatter(1000, perfs_med_lin.ifgls[perfs_med_sqrt.Samples==1000], 
                    color=orange, alpha=0.8, marker='*', s=100, zorder=99, lw=0.2, edgecolor='black')
-plt.savefig('paper_figures/estimator_benchmark_lin.pdf')
+plt.savefig('paper_figures/estimator_benchmark_lin.pdf', transparent=True)
