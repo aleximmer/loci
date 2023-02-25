@@ -14,7 +14,7 @@ To use the LOCI estimator on some pair x, y in the default setting (with neural 
 ```python
 from causa.loci import loci
 score = loci(x, y)
-# The score is always such that > 0 indicates x -> y and < 0 indicates y -> x.
+# The score is such that score > 0 indicates x -> y and score < 0 indicates y -> x.
 print(score)
 ```
 

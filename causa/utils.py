@@ -68,7 +68,7 @@ def plot_pair(x, y, f_forward, f_reverse):
     m_rev, s_rev = f_reverse(y)
 
     with plt.rc_context({**bundles.aistats2022(column='half'), **axes.lines()}):
-        fig, axss = plt.subplots(nrows=2, ncols=2, figsize=(4, 3), sharex=True)
+        fig, axss = plt.subplots(nrows=2, ncols=2, figsize=(4, 3))
         axs = axss[0]
         axs[0].scatter(x, y, alpha=0.3, color='black', lw=0.5, s=8)
         axs[0].plot(x_test, m_for_test, label='LSNM', color='tab:blue', lw=1.5)
@@ -92,11 +92,13 @@ def plot_pair(x, y, f_forward, f_reverse):
         axs[1].grid()
 
         axs = axss[1]
+        axs[0].set_xlim(x_test.min()+0.4, x_test.max())
         axs[0].scatter(x, (y - m_for) / s_for, lw=0.5, s=8, color='black', alpha=0.3)
         axs[0].grid()
         axs[0].set_ylabel('Residual $\\frac{Y - f(X)}{g(X)}$')
         axs[0].set_xlabel('Cause $X$')
 
+        axs[1].set_xlim(y_test.min(), y_test.max())
         axs[1].scatter(y, (x - m_rev) / s_rev, lw=0.5, s=8, color='black', alpha=0.3)
         axs[1].set_xlabel('Effect $Y$')
         axs[1].set_ylabel('Residual $\\frac{X - h(Y)}{k(Y)}$')
