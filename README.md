@@ -9,6 +9,34 @@ Requires `python>=3.8`. Install dependencies with
 pip install -r requirements.txt
 ```
 
+## Example Usage
+To use the LOCI estimator on some pair x, y in the default setting (with neural network and subsequent independence test) use it like
+```python
+from causa.loci import loci
+score = loci(x, y)
+# The score is always such that > 0 indicates x -> y and < 0 indicates y -> x.
+print(score)
+```
+
+To use LOCI with a particular dataset provided in this repository and also plot the estimator fit and scaled residuals that are used for the independence test, the following snippet might be helpful:
+```python
+from sklearn.preprocessing import StandardScaler
+from causa.loci import loci
+from causa.datasets import MNU
+from causa.utils import plot_pair
+
+# We use the MNU pair 55 as an example and standardize the data
+dataset = MNU(55, preprocessor=StandardScaler(), double=True)
+x, y = dataset.cause.flatten().numpy(), dataset.effect.flatten().numpy()
+
+# This function call shows all options of LOCI, we return_function to visualize the estimator
+score, f_forward, f_reverse = loci(
+    x, y, independence_test=True, neural_network=True, 
+    return_function=True, n_steps=5000
+)
+plot_pair(x, y, f_forward, f_reverse)
+```
+
 ## Reproduce All Results 
 First, create all necessary commands to be executed with
 ```
