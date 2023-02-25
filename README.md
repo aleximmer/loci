@@ -1,7 +1,5 @@
 # Code for Location-Scale Causal Inference (LOCI) estimator for bivariate causal model identification
 
-![MNU_55_example_lsnm_only](https://user-images.githubusercontent.com/7715036/220191420-22909975-8727-4ca4-851d-7f57f818b95a.png)
-
 ## Setup
 
 Requires `python>=3.8`. Install dependencies with
@@ -36,6 +34,8 @@ score, f_forward, f_reverse = loci(
 )
 plot_pair(x, y, f_forward, f_reverse)
 ```
+![MNU_False](https://user-images.githubusercontent.com/7715036/221351915-fedaa072-7dff-4805-8b87-c50a862f935c.png#gh-light-mode-only)
+![MNU_True](https://user-images.githubusercontent.com/7715036/221351917-ea3fa7f2-971d-4317-822b-60cce218292a.png#gh-dark-mode-only)
 
 ## Reproduce All Results 
 First, create all necessary commands to be executed with
