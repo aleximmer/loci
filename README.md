@@ -1,3 +1,6 @@
+[![arXiv](https://img.shields.io/badge/arXiv-2306.11078-b31b1b.svg)](https://arxiv.org/abs/2210.09054)
+[![Venue](https://img.shields.io/badge/venue-ICML_2023-darkblue)](https://proceedings.mlr.press/v202/immer23a.html)
+
 # Code for Location-Scale Causal Inference (LOCI) estimator for bivariate causal model identification
 
 ## Setup
